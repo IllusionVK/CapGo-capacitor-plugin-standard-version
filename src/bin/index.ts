@@ -1,9 +1,46 @@
 import * as android from './android';
 import * as ios from './ios';
 
+import { readFileSync } from 'fs';
+import { readdir } from 'fs/promises';
 import merge from 'merge-deep';
+import { extname } from 'path';
 import standardVersion from 'standard-version';
 import command from 'standard-version/command';
+
+const findByExtension = async (dir, ext) => {
+  const matchedFiles = [];
+
+  const files = await readdir(dir);
+
+  for (const file of files) {
+    // Method 1:
+    const fileExt = extname(file);
+
+    if (fileExt === `.${ext}`) {
+      // remove extname
+      const noExt = file.replace(fileExt, '');
+      matchedFiles.push(noExt);
+    }
+  }
+
+  return matchedFiles;
+};
+
+const findPathPlugin = async () => {
+  const files = await findByExtension('./ios/Plugin', 'm');
+  const fileName = files[0];
+  const iosPath = `./ios/Plugin/${fileName}.swift`;
+
+  const fileAndroid = './android/build.gradle';
+  const contentsAndroid = readFileSync(fileAndroid, 'utf8');
+  const resultAndroid = contentsAndroid
+    .match(/namespace "(.*)"/g)[0]
+    .replace(/namespace "(.*)"/g, '$1');
+  const foldersPath = resultAndroid.split('.').join('/');
+  const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`;
+  return { iosPath, androidPath };
+};
 
 const baseConfig = {
   noVerify: true,
@@ -16,8 +53,12 @@ const baseConfig = {
   ],
   bumpFiles: [
     {
-      filename: './android/app/build.gradle',
+      filename: '',
       updater: android,
+    },
+    {
+      filename: '',
+      updater: ios,
     },
     {
       filename: './package.json',
@@ -27,16 +68,15 @@ const baseConfig = {
       filename: './package-lock.json',
       type: 'json',
     },
-    {
-      filename: './ios/App/App.xcodeproj/project.pbxproj',
-      updater: ios,
-    },
   ],
 };
 
 async function run() {
   try {
     // merge base config with user config
+    const { iosPath, androidPath } = await findPathPlugin();
+    baseConfig.bumpFiles[0].filename = iosPath;
+    baseConfig.bumpFiles[1].filename = androidPath;
     const finalConfig = merge(command.argv, baseConfig);
     await standardVersion(finalConfig);
   } catch (error) {

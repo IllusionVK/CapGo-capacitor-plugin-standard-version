@@ -1,22 +1,13 @@
-import { versionBetaToCode, versionCodeToCodeBeta, versionPureToCode } from './utils';
-
 export const readVersion = contents => {
-  const version = contents.split('versionName "')[1].split('"')[0];
+  const marketingVersionString = contents.match(/String PLUGIN_VERSION = "(.*)";/);
+  const version = marketingVersionString.toString();
   return version;
 };
 
 export const writeVersion = (contents, version) => {
-  const [versionPure, versionBeta] = version.split('-');
   const newContent = contents.replace(
-    /(.*(?:versionName[ \t]+).*)/g,
-    `\t\tversionName "${versionPure}"`
+    /String PLUGIN_VERSION = ".*";/g,
+    `String PLUGIN_VERSION = "${version}";`
   );
-  let versionCode = versionPureToCode(versionPure);
-  let versionCodeBeta = versionBetaToCode(versionBeta);
-  const versionCodeFinal = versionCodeToCodeBeta(versionCode, versionCodeBeta);
-  const finalContent = newContent.replace(
-    /(.*(?:versionCode[ \t]+).*)/g,
-    `\t\tversionCode ${versionCodeFinal}`
-  );
-  return finalContent;
+  return newContent;
 };

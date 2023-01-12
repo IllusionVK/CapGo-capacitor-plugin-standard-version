@@ -10,11 +10,24 @@ All config from .versionrc, .versionrc.json or .versionrc.js are supported
 ## Install 
 
 
-`npm i capacitor-standard-version`
+`npm i capacitor-plugin-standard-version`
 
 ## Usage
 
-Run `npx capacitor-standard-version` for update main version or `npx capacitor-standard-version --prerelease alpha` for alpha release for dev branch.
+Run `npx capacitor-plugin-standard-version` for update main version or `npx capacitor-plugin-standard-version --prerelease alpha` for alpha release for dev branch.
+
+This package will automatically manage your changelog and the version number in 4 places:
+- package.json (version key)
+- package-lock.json (version key) optional
+- Your main iOS file (guessed) (PLUGIN_VERSION key)
+- your main android file (guessed) (PLUGIN_VERSION key)
+
+If not present in your package add the variable `PLUGIN_VERSION` in Android and iOS.
+Add a method `getNativeVersion()` in native who will return the version, that useful for Capgo auto-update context when dev want to be certain they don't make a breaking change in production.
+Add `getJsVersion()` in JS code to allow user to check the JS version, who can be updated by updater.
+Add `checkVersionMatch()` in JS code to allow user to check if the JS and native version match.
+
+
 
 Exemple of Github action to do it on every commit in `main` and `development`
 
@@ -42,10 +55,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
       - name: Create bump and changelog
         if: github.ref == 'refs/heads/main'
-        run: npx capacitor-standard-version
+        run: npx capacitor-plugin-standard-version
       - name: Create bump and changelog
         if: github.ref != 'refs/heads/main'
-        run: npx capacitor-standard-version --prerelease alpha
+        run: npx capacitor-plugin-standard-version --prerelease alpha
       - name: Push to origin
         run: |
           CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
