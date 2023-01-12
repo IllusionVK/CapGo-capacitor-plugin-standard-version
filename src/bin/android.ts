@@ -1,10 +1,8 @@
 const regexAndroid = /String\sPLUGIN_VERSION\s=\s"(.*)";/g;
 
 export function readVersion(contents) {
-  const marketingVersionString = contents.match(regexAndroid);
-  const version = marketingVersionString
-    ? marketingVersionString[0].replace(regexAndroid, '$1')
-    : null;
+  const vString = contents.match(regexAndroid);
+  const version = vString && vString[0] ? vString[0].replace(regexAndroid, '$1') : null;
   return version;
 }
 
