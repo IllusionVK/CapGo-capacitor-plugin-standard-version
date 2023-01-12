@@ -35,7 +35,13 @@ const findPathPlugin = async () => {
   const fileAndroid = './android/build.gradle';
   const contentsAndroid = readFileSync(fileAndroid, 'utf8');
   const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g);
-  const resultAndroid = resultMatchAndroid && resultMatchAndroid[0] ? resultMatchAndroid[0].replace(/namespace "(.*)"/g, '$1') : null;
+  if(!resultMatchAndroid || !resultMatchAndroid[0]) {
+    throw new Error('Namespace not found in android/build.gradle');
+  }
+  const resultAndroid =
+    resultMatchAndroid && resultMatchAndroid[0]
+      ? resultMatchAndroid[0].replace(/namespace "(.*)"/g, '$1')
+      : null;
   const foldersPath = resultAndroid.split('.').join('/');
   const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`;
   return { iosPath, androidPath };
