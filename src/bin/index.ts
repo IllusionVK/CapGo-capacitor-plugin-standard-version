@@ -34,9 +34,8 @@ const findPathPlugin = async () => {
 
   const fileAndroid = './android/build.gradle';
   const contentsAndroid = readFileSync(fileAndroid, 'utf8');
-  const resultAndroid = contentsAndroid
-    .match(/namespace "(.*)"/g)[0]
-    .replace(/namespace "(.*)"/g, '$1');
+  const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g);
+  const resultAndroid = resultMatchAndroid && resultMatchAndroid[0] ? resultMatchAndroid[0].replace(/namespace "(.*)"/g, '$1') : null;
   const foldersPath = resultAndroid.split('.').join('/');
   const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`;
   return { iosPath, androidPath };
