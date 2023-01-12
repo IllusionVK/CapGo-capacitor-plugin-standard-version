@@ -1,13 +1,14 @@
-export const readVersion = contents => {
-  const marketingVersionString = contents.match(/String PLUGIN_VERSION = "(.*)";/);
-  const version = marketingVersionString.toString();
-  return version;
-};
+const regexAndroid = /String\sPLUGIN_VERSION\s=\s"(.*)";/g;
 
-export const writeVersion = (contents, version) => {
-  const newContent = contents.replace(
-    /String PLUGIN_VERSION = ".*";/g,
-    `String PLUGIN_VERSION = "${version}";`
-  );
+export function readVersion(contents) {
+  const marketingVersionString = contents.match(regexAndroid);
+  const version = marketingVersionString
+    ? marketingVersionString[0].replace(regexAndroid, '$1')
+    : null;
+  return version;
+}
+
+export function writeVersion(contents, version) {
+  const newContent = contents.replace(regexAndroid, `String PLUGIN_VERSION = "${version}";`);
   return newContent;
-};
+}

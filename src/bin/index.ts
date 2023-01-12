@@ -75,8 +75,8 @@ async function run() {
   try {
     // merge base config with user config
     const { iosPath, androidPath } = await findPathPlugin();
-    baseConfig.bumpFiles[0].filename = iosPath;
-    baseConfig.bumpFiles[1].filename = androidPath;
+    baseConfig.bumpFiles[0].filename = androidPath;
+    baseConfig.bumpFiles[1].filename = iosPath;
     const finalConfig = merge(command.argv, baseConfig);
     await standardVersion(finalConfig);
   } catch (error) {
