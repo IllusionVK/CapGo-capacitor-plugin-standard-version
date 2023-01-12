@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://github.com/Cap-go/capacitor-plugin-standard-version/compare/v1.1.3...v1.1.4) (2023-01-12)
+
+
+### Bug Fixes
+
+* add more info if fail ([0aec6da](https://github.com/Cap-go/capacitor-plugin-standard-version/commit/0aec6da225a4dd2f8036cb4f7348d960b1806734))
+* protect if missing namespace ([2f3ee2f](https://github.com/Cap-go/capacitor-plugin-standard-version/commit/2f3ee2fdac62eb3dd2057335520d76315815ec23))
+* script if namespace missing ([240314d](https://github.com/Cap-go/capacitor-plugin-standard-version/commit/240314d791703a5f10ec3ddcad3f129dc9cfe77c))
+
 ### [1.1.3](https://github.com/Cap-go/capacitor-plugin-standard-version/compare/v1.1.2...v1.1.3) (2023-01-12)
 
 
