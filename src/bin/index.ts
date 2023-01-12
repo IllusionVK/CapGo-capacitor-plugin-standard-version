@@ -29,14 +29,17 @@ const findByExtension = async (dir, ext) => {
 
 const findPathPlugin = async () => {
   const files = await findByExtension('./ios/Plugin', 'm');
+  if (!files || !files[0]) {
+    throw new Error('File ending by .m not found in ios/Plugin, cannot guess your plugin name');
+  }
   const fileName = files[0];
   const iosPath = `./ios/Plugin/${fileName}.swift`;
 
   const fileAndroid = './android/build.gradle';
   const contentsAndroid = readFileSync(fileAndroid, 'utf8');
   const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g);
-  if(!resultMatchAndroid || !resultMatchAndroid[0]) {
-    throw new Error('Namespace not found in android/build.gradle');
+  if (!resultMatchAndroid || !resultMatchAndroid[0]) {
+    throw new Error('Namespace not found in android/build.gradle, cannot guess your plugin name');
   }
   const resultAndroid =
     resultMatchAndroid && resultMatchAndroid[0]
