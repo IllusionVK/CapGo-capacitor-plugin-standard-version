@@ -9,7 +9,7 @@ export function readVersion(contents) {
 export function writeVersion(contents, version) {
   const newContent = contents.replace(
     regexIos,
-    `private\slet\sPLUGIN_VERSION:\sString\s=\s"${version}"`
+    `private let PLUGIN_VERSION: String = "${version}"`
   );
   return newContent;
 }

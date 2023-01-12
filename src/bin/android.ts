@@ -9,7 +9,7 @@ export function readVersion(contents) {
 export function writeVersion(contents, version) {
   const newContent = contents.replace(
     regexAndroid,
-    `private\sfinal\sString\sPLUGIN_VERSION\s=\s"${version}";`
+    `private final String PLUGIN_VERSION = "${version}";`
   );
   return newContent;
 }
