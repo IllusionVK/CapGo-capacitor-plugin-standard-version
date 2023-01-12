@@ -1,12 +1,12 @@
 import * as android from './android';
 import * as ios from './ios';
 
+import standardVersion from '@capgo/standard-version';
+import command from '@capgo/standard-version/command';
 import { readFileSync } from 'fs';
 import { readdir } from 'fs/promises';
 import merge from 'merge-deep';
 import { extname } from 'path';
-import standardVersion from 'standard-version';
-import command from 'standard-version/command';
 
 const findByExtension = async (dir, ext) => {
   const matchedFiles = [];

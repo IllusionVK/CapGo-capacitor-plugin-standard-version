@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/Cap-go/capacitor-plugin-standard-version#readme",
   "dependencies": {
-    "merge-deep": "^3.0.3",
-    "standard-version": "^9.5.0"
+    "@capgo/standard-version": "^1.0.6",
+    "merge-deep": "^3.0.3"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
