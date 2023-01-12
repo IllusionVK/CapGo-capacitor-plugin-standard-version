@@ -1,4 +1,4 @@
-const regexIos = /let\sPLUGIN_VERSION:\sString\s=\s"(.*)"/g;
+const regexIos = /private\slet\sPLUGIN_VERSION:\sString\s=\s"(.*)"/g;
 
 export function readVersion(contents) {
   const vString = contents.match(regexIos);
@@ -7,6 +7,9 @@ export function readVersion(contents) {
 }
 
 export function writeVersion(contents, version) {
-  const newContent = contents.replace(regexIos, `let PLUGIN_VERSION = "${version}"`);
+  const newContent = contents.replace(
+    regexIos,
+    `private\slet\sPLUGIN_VERSION:\sString\s=\s"${version}"`
+  );
   return newContent;
 }

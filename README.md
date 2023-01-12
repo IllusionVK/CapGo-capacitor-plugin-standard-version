@@ -19,10 +19,32 @@ Run `npx capacitor-plugin-standard-version` for update main version or `npx capa
 This package will automatically manage your changelog and the version number in 4 places:
 - package.json (version key)
 - package-lock.json (version key) optional
-- Your main iOS file (guessed) (PLUGIN_VERSION key)
-- your main android file (guessed) (PLUGIN_VERSION key)
+- Your main iOS file (guessed) search for `private let PLUGIN_VERSION: String = "(.*)"`
+- your main android file (guessed) search for `private final String PLUGIN_VERSION = "(.*)"`
 
-If not present in your package add the variable `PLUGIN_VERSION` in Android and iOS.
+If not present in your package add:
+in Android `private final String PLUGIN_VERSION = "1.2.3"`
+in iOS `private let PLUGIN_VERSION: String = "1.2.3"`
+
+Add in android then 
+```java
+  @PluginMethod
+  public void getPluginVersion(final PluginCall call) {
+    try {
+      final JSObject ret = new JSObject();
+      ret.put("version", this.PLUGIN_VERSION);
+      call.resolve(ret);
+    } catch (final Exception e) {
+      call.reject("Could not get plugin version", e);
+    }
+  }
+```
+And in IOS
+```swift
+    @objc func getPluginVersion(_ call: CAPPluginCall) {
+        call.resolve(["version": self.PLUGIN_VERSION])
+    }
+```
 Add a method `getNativeVersion()` in native who will return the version, that useful for Capgo auto-update context when dev want to be certain they don't make a breaking change in production.
 Add `getJsVersion()` in JS code to allow user to check the JS version, who can be updated by updater.
 Add `checkVersionMatch()` in JS code to allow user to check if the JS and native version match.
