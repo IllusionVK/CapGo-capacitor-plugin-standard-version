@@ -1,54 +1,53 @@
-import * as android from './android';
-import * as ios from './ios';
+import { readFileSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
+import { extname } from 'node:path'
+import standardVersion from '@capgo/standard-version'
+import command from '@capgo/standard-version/command'
+import merge from 'merge-deep'
+import * as ios from './ios'
+import * as android from './android'
 
-import standardVersion from '@capgo/standard-version';
-import command from '@capgo/standard-version/command';
-import { readFileSync } from 'fs';
-import { readdir } from 'fs/promises';
-import merge from 'merge-deep';
-import { extname } from 'path';
+async function findByExtension(dir, ext) {
+  const matchedFiles = []
 
-const findByExtension = async (dir, ext) => {
-  const matchedFiles = [];
-
-  const files = await readdir(dir);
+  const files = await readdir(dir)
 
   for (const file of files) {
     // Method 1:
-    const fileExt = extname(file);
+    const fileExt = extname(file)
 
     if (fileExt === `.${ext}`) {
       // remove extname
-      const noExt = file.replace(fileExt, '');
-      matchedFiles.push(noExt);
+      const noExt = file.replace(fileExt, '')
+      matchedFiles.push(noExt)
     }
   }
 
-  return matchedFiles;
-};
+  return matchedFiles
+}
 
-const findPathPlugin = async () => {
-  const files = await findByExtension('./ios/Plugin', 'm');
+async function findPathPlugin() {
+  const files = await findByExtension('./ios/Plugin', 'm')
   if (!files || !files[0]) {
-    throw new Error('File ending by .m not found in ios/Plugin, cannot guess your plugin name');
+    throw new Error('File ending by .m not found in ios/Plugin, cannot guess your plugin name')
   }
-  const fileName = files[0];
-  const iosPath = `./ios/Plugin/${fileName}.swift`;
+  const fileName = files[0]
+  const iosPath = `./ios/Plugin/${fileName}.swift`
 
-  const fileAndroid = './android/build.gradle';
-  const contentsAndroid = readFileSync(fileAndroid, 'utf8');
-  const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g);
+  const fileAndroid = './android/build.gradle'
+  const contentsAndroid = readFileSync(fileAndroid, 'utf8')
+  const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g)
   if (!resultMatchAndroid || !resultMatchAndroid[0]) {
-    throw new Error('Namespace not found in android/build.gradle, cannot guess your plugin name');
+    throw new Error('Namespace not found in android/build.gradle, cannot guess your plugin name')
   }
-  const resultAndroid =
-    resultMatchAndroid && resultMatchAndroid[0]
+  const resultAndroid
+    = resultMatchAndroid && resultMatchAndroid[0]
       ? resultMatchAndroid[0].replace(/namespace "(.*)"/g, '$1')
-      : null;
-  const foldersPath = resultAndroid.split('.').join('/');
-  const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`;
-  return { iosPath, androidPath };
-};
+      : null
+  const foldersPath = resultAndroid.split('.').join('/')
+  const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`
+  return { iosPath, androidPath }
+}
 
 const baseConfig = {
   noVerify: true,
@@ -77,20 +76,21 @@ const baseConfig = {
       type: 'json',
     },
   ],
-};
+}
 
 async function run() {
   try {
     // merge base config with user config
-    const { iosPath, androidPath } = await findPathPlugin();
-    baseConfig.bumpFiles[0].filename = androidPath;
-    baseConfig.bumpFiles[1].filename = iosPath;
-    const finalConfig = merge(command.argv, baseConfig);
-    await standardVersion(finalConfig);
-  } catch (error) {
-    console.error(error);
-    throw error;
+    const { iosPath, androidPath } = await findPathPlugin()
+    baseConfig.bumpFiles[0].filename = androidPath
+    baseConfig.bumpFiles[1].filename = iosPath
+    const finalConfig = merge(command.argv, baseConfig)
+    await standardVersion(finalConfig)
+  }
+  catch (error) {
+    console.error(error)
+    throw error
   }
 }
 
-run();
+run()

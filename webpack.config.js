@@ -1,7 +1,8 @@
-const path = require('path');
-const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
-console.log(process.env.NODE_ENV || 'production');
+const path = require('node:path')
+const webpack = require('webpack')
+const nodeExternals = require('webpack-node-externals')
+
+console.log(process.env.NODE_ENV || 'production')
 module.exports = {
   mode: process.env.NODE_ENV || 'production',
   target: 'node',
@@ -26,4 +27,4 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
-};
+}

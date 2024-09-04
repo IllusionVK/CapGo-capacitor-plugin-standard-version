@@ -6,9 +6,7 @@ use it at builtin replacement of https://www.npmjs.com/package/standard-version
 
 All config from .versionrc, .versionrc.json or .versionrc.js are supported
 
-
-## Install 
-
+## Install
 
 `npm i capacitor-plugin-standard-version`
 
@@ -26,7 +24,7 @@ If not present in your package add:
 in Android `private final String PLUGIN_VERSION = "1.2.3"`
 in iOS `private let PLUGIN_VERSION: String = "1.2.3"`
 
-Add in android then 
+Add in android then
 ```java
   @PluginMethod
   public void getPluginVersion(final PluginCall call) {
@@ -49,8 +47,6 @@ Add a method `getNativeVersion()` in native who will return the version, that us
 Add `getJsVersion()` in JS code to allow user to check the JS version, who can be updated by updater.
 Add `checkVersionMatch()` in JS code to allow user to check if the JS and native version match.
 
-
-
 Exemple of Github action to do it on every commit in `main` and `development`
 
 ```yml
@@ -62,9 +58,9 @@ on:
 
 jobs:
   bump-version:
-    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+    if: '!startsWith(github.event.head_commit.message, ''chore(release):'')'
     runs-on: ubuntu-latest
-    name: "Bump version and create changelog with standard version"
+    name: Bump version and create changelog with standard version
     steps:
       - name: Check out
         uses: actions/checkout@v3
