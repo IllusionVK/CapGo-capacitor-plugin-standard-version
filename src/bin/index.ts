@@ -1,23 +1,21 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
-import { extname } from 'node:path'
+import { extname, join } from 'node:path'
 import standardVersion from '@capgo/standard-version'
 import command from '@capgo/standard-version/command'
 import merge from 'merge-deep'
 import * as ios from './ios'
 import * as android from './android'
 
-async function findByExtension(dir, ext) {
+async function findByExtension(dir: string, ext: string): Promise<string[]> {
   const matchedFiles = []
 
   const files = await readdir(dir)
 
   for (const file of files) {
-    // Method 1:
     const fileExt = extname(file)
 
     if (fileExt === `.${ext}`) {
-      // remove extname
       const noExt = file.replace(fileExt, '')
       matchedFiles.push(noExt)
     }
@@ -26,14 +24,37 @@ async function findByExtension(dir, ext) {
   return matchedFiles
 }
 
-async function findPathPlugin() {
-  const files = await findByExtension('./ios/Plugin', 'm')
-  if (!files || !files[0]) {
-    throw new Error('File ending by .m not found in ios/Plugin, cannot guess your plugin name')
+async function findPathPlugin(): Promise<{ iosPath: string; androidPath: string }> {
+  // iOS path
+  let iosPath = ''
+  const oldIosDir = './ios/Plugin'
+  const newIosDir = './ios/Sources'
+  
+  if (existsSync(oldIosDir)) {
+    const files = await findByExtension(oldIosDir, 'm')
+    if (!files || !files[0]) {
+      throw new Error('File ending by .m not found in ios/Plugin, cannot guess your plugin name')
+    }
+    const fileName = files[0]
+    iosPath = join(oldIosDir, `${fileName}.swift`)
+  } else if (existsSync(newIosDir)) {
+    const pluginDirs = await readdir(newIosDir)
+    const pluginDir = pluginDirs.find(dir => dir.toLowerCase().includes('plugin'))
+    if (!pluginDir) {
+      throw new Error('Plugin directory not found in ios/Sources')
+    }
+    const fullPluginDir = join(newIosDir, pluginDir)
+    const swiftFiles = await findByExtension(fullPluginDir, 'swift')
+    if (!swiftFiles || swiftFiles.length === 0) {
+      throw new Error(`Swift files not found in ${fullPluginDir}`)
+    }
+    const pluginFile = swiftFiles.find(file => file.toLowerCase().endsWith('plugin')) || swiftFiles[0]
+    iosPath = join(fullPluginDir, `${pluginFile}.swift`)
+  } else {
+    throw new Error('iOS plugin directory not found')
   }
-  const fileName = files[0]
-  const iosPath = `./ios/Plugin/${fileName}.swift`
 
+  // Android path
   const fileAndroid = './android/build.gradle'
   const contentsAndroid = readFileSync(fileAndroid, 'utf8')
   const resultMatchAndroid = contentsAndroid.match(/namespace\s"(.*)"/g)
@@ -45,7 +66,9 @@ async function findPathPlugin() {
       ? resultMatchAndroid[0].replace(/namespace "(.*)"/g, '$1')
       : null
   const foldersPath = resultAndroid.split('.').join('/')
+  const fileName = iosPath.split('/').pop()?.replace('.swift', '')
   const androidPath = `./android/src/main/java/${foldersPath}/${fileName}.java`
+
   return { iosPath, androidPath }
 }
 
