@@ -24,12 +24,12 @@ async function findByExtension(dir: string, ext: string): Promise<string[]> {
   return matchedFiles
 }
 
-async function findPathPlugin(): Promise<{ iosPath: string; androidPath: string }> {
+async function findPathPlugin(): Promise<{ iosPath: string, androidPath: string }> {
   // iOS path
   let iosPath = ''
   const oldIosDir = './ios/Plugin'
   const newIosDir = './ios/Sources'
-  
+
   if (existsSync(oldIosDir)) {
     const files = await findByExtension(oldIosDir, 'm')
     if (!files || !files[0]) {
@@ -37,7 +37,8 @@ async function findPathPlugin(): Promise<{ iosPath: string; androidPath: string 
     }
     const fileName = files[0]
     iosPath = join(oldIosDir, `${fileName}.swift`)
-  } else if (existsSync(newIosDir)) {
+  }
+  else if (existsSync(newIosDir)) {
     const pluginDirs = await readdir(newIosDir)
     const pluginDir = pluginDirs.find(dir => dir.toLowerCase().includes('plugin'))
     if (!pluginDir) {
@@ -50,7 +51,8 @@ async function findPathPlugin(): Promise<{ iosPath: string; androidPath: string 
     }
     const pluginFile = swiftFiles.find(file => file.toLowerCase().endsWith('plugin')) || swiftFiles[0]
     iosPath = join(fullPluginDir, `${pluginFile}.swift`)
-  } else {
+  }
+  else {
     throw new Error('iOS plugin directory not found')
   }
 
